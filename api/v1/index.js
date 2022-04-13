@@ -23,6 +23,13 @@ function authzHasCourseInstanceView(req, res, next) {
 // Pretty-print all JSON responses
 router.use(require('./prettyPrintJson'));
 
+// All course pages require authorization
+router.use('/courses/:course_id', [
+  require('../../middlewares/authzCourseOrInstance'),
+  require('../../middlewares/authzHasCoursePreview'),
+  require('./endpoints/courseInfo'),
+]);
+
 // All course instance pages require authorization
 router.use('/course_instances/:course_instance_id', [
   require('../../middlewares/authzCourseOrInstance'),

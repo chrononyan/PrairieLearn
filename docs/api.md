@@ -1,6 +1,6 @@
 # API
 
-PrairieLearn contains a limited read-only API for use by instructors that
+PrairieLearn contains a limited API for use by instructors that
 allows programmatic access to assessments, assessment instances, and
 submissions.
 
@@ -44,61 +44,81 @@ at port 3000, the API is accessible via http://localhost:3000/pl/api/v1/.
 In the endpoint list below, path components starting with a colon like
 `:course_instance_id` should be replaced with the integer IDs.
 
+- **Course info:**
+
+  - `GET /pl/api/v1/courses/:course_id`
+  - Information about the course.
+
+- **Course job sequences list:**
+
+  - `GET /pl/api/v1/courses/:course_id/job_sequences`
+  - All job sequences for the course.
+
+- **Course job sequence:**
+
+  - `GET /pl/api/v1/courses/:course_id/job_sequences/:job_sequence_id`
+  - Information about the job sequence.
+
+- **Pull course:**
+
+  - `POST /pl/api/v1/courses/:course_id/syncs/pull`
+  - Pull updates from the course git repo.
+
 - **Course instance info:**
 
-  - `/pl/api/v1/course_instances/:course_instance_id`
+  - `GET /pl/api/v1/course_instances/:course_instance_id`
   - Information about the course instance.
 
 - **Gradebook:**
 
-  - `/pl/api/v1/course_instances/:course_instance_id/gradebook`
+  - `GET /pl/api/v1/course_instances/:course_instance_id/gradebook`
   - All of the data available in the course gradebook, with one entry per user containing summary data on all assessments.
 
 - **Course instance access rules list:**
 
-  - `/pl/api/v1/course_instances/:course_instance_id/course_instance_access_rules`
+  - `GET /pl/api/v1/course_instances/:course_instance_id/course_instance_access_rules`
   - All access rules for the course instance.
 
 - **Assessments list:**
 
-  - `/pl/api/v1/course_instances/:course_instance_id/assessments`
+  - `GET /pl/api/v1/course_instances/:course_instance_id/assessments`
   - All assessments in the course instance.
 
 - **Single assessment:**
 
-  - `/pl/api/v1/course_instances/:course_instance_id/assessments/:assessment_id`
+  - `GET /pl/api/v1/course_instances/:course_instance_id/assessments/:assessment_id`
   - One specific assessment.
 
 - **Assessment instances list:**
 
-  - `/pl/api/v1/course_instances/:course_instance_id/assessments/:assessment_id/assessment_instances`
+  - `GET /pl/api/v1/course_instances/:course_instance_id/assessments/:assessment_id/assessment_instances`
   - All assessment instances for a given assessment.
 
 - **Assessment access rules list:**
 
-  - `/pl/api/v1/course_instances/:course_instance_id/assessments/:assessment_id/assessment_access_rules`
+  - `GET /pl/api/v1/course_instances/:course_instance_id/assessments/:assessment_id/assessment_access_rules`
   - All assessment access rules for a given assessment.
 
 - **One assessment instance:**
 
-  - `/pl/api/v1/course_instances/:course_instance_id/assessment_instances/:assessment_instance_id`
+  - `GET /pl/api/v1/course_instances/:course_instance_id/assessment_instances/:assessment_instance_id`
   - One specific assessment instance.
 
 - **Instance questions list:**
 
-  - `/pl/api/v1/course_instances/:course_instance_id/assessment_instances/:assessment_instance_id/instance_questions`
+  - `GET /pl/api/v1/course_instances/:course_instance_id/assessment_instances/:assessment_instance_id/instance_questions`
   - All instance questions for a given assessment instance.
 
 - **Submissions list:**
 
-  - `/pl/api/v1/course_instances/:course_instance_id/assessment_instances/:assessment_instance_id/submissions`
+  - `GET /pl/api/v1/course_instances/:course_instance_id/assessment_instances/:assessment_instance_id/submissions`
   - All submissions for a given assessment instance.
 
 - **Assessment Instance Event Log:**
 
-  - `/pl/api/v1/course_instances/:course_instance_id/assessment_instances/:assessment_instance_id/log`
+  - `GET /pl/api/v1/course_instances/:course_instance_id/assessment_instances/:assessment_instance_id/log`
   - Retrieves the event log for a specific assessment.
 
 - **One submission:**
-  - `/pl/api/v1/course_instances/:course_instance_id/submissions/:submission_id`
+  - `GET /pl/api/v1/course_instances/:course_instance_id/submissions/:submission_id`
   - One specific submission.

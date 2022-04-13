@@ -1,4 +1,4 @@
-<% if (typeof authn_user != 'undefined') { %>
+<% if (typeof authn_user != 'undefined' && typeof authn_provider_name != 'undefined') { %>
    <% if (authn_provider_name == 'Shibboleth' || authn_provider_name == 'Google' || authn_provider_name == 'Azure'
           || authn_provider_name == 'LTI') { %>
        <a class="dropdown-item" href="<%= plainUrlPrefix %>/logout">Log out</a>

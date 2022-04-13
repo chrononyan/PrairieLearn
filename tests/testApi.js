@@ -319,5 +319,49 @@ describe('API', function () {
       assert.exists(json.course_instance_id);
       assert.exists(json.course_title);
     });
+
+    step('GET to API for course info succeeds', async function () {
+      locals.apiCourseUrl = locals.apiUrl + '/courses/1';
+
+      const res = await fetch(locals.apiCourseUrl, {
+        headers: {
+          'Private-Token': locals.api_token,
+        },
+      });
+      assert.equal(res.status, 200);
+
+      const json = await res.json();
+      assert.exists(json.id);
+      assert.exists(json.title);
+    });
+
+    step('GET to API for course job sequences succeeds', async function () {
+      locals.apiCourseJobSequencesUrl = locals.apiCourseUrl + '/job_sequences';
+
+      const res = await fetch(locals.apiCourseJobSequencesUrl, {
+        headers: {
+          'Private-Token': locals.api_token,
+        },
+      });
+      assert.equal(res.status, 200);
+
+      const json = await res.json();
+      assert.lengthOf(json, 0); // TODO
+    });
+
+    step('GET to API for course job sequence succeeds', async function () {
+      locals.apiCourseJobSequenceUrl = locals.apiCourseUrl + '/job_sequences/1';
+
+      const res = await fetch(locals.apiCourseJobSequenceUrl, {
+        headers: {
+          'Private-Token': locals.api_token,
+        },
+      });
+      assert.equal(res.status, 200);
+
+      const json = await res.json();
+      assert.exists(json.id);
+      assert.exists(json.jobs);
+    });
   });
 });

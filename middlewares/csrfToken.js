@@ -6,6 +6,10 @@ var error = require('../prairielib/lib/error');
 var csrf = require('../lib/csrf');
 
 module.exports = function (req, res, next) {
+  if (res.locals.is_authn_token) {
+    return next();
+  }
+
   var tokenData = {
     url: req.originalUrl,
   };

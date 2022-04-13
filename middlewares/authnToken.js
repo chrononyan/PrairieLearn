@@ -37,6 +37,7 @@ module.exports = (req, res, next) => {
       // Nice, we got a user
       res.locals.authn_user = result.rows[0].user;
       res.locals.is_administrator = result.rows[0].is_administrator;
+      res.locals.is_authn_token = true;
 
       // Let's note that this token was used, but don't wait for this
       // to continue handling the request

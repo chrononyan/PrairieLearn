@@ -122,6 +122,29 @@ SELECT
 FROM
     object_data;
 
+-- BLOCK select_course_info
+WITH object_data AS (
+    SELECT
+        pl_c.id,
+        pl_c.title,
+        pl_c.short_name,
+        pl_c.display_timezone,
+        format_date_iso8601(pl_c.deleted_at, pl_c.display_timezone) AS deleted_at,
+        pl_c.institution_id,
+        pl_c.repository,
+        pl_c.commit_hash,
+        pl_c.branch,
+        pl_c.manual_grading_visible
+    FROM
+        pl_courses AS pl_c
+    WHERE
+        pl_c.id = $course_id
+)
+SELECT
+    to_jsonb(object_data) AS item
+FROM
+    object_data;
+
 -- BLOCK select_course_instance_info
 WITH object_data AS (
     SELECT
@@ -277,3 +300,118 @@ FROM
 WHERE
     ai.id = $unsafe_assessment_instance_id
     AND ci.id = $course_instance_id;
+
+-- BLOCK select_job_sequence_with_jobs
+WITH member_jobs AS (
+    SELECT
+        j.id,
+        j.description,
+        j.type,
+        j.status,
+        j.error_message,
+        format_date_iso8601(j.start_date, c.display_timezone) AS start_date,
+        format_date_iso8601(j.finish_date, c.display_timezone) AS finish_date,
+        j.course_id,
+        j.course_instance_id,
+        j.course_request_id,
+        j.job_sequence_id,
+        j.assessment_id,
+        j.user_id,
+        u.uid AS user_uid,
+        j.authn_user_id,
+        authn_u.uid AS authn_user_uid,
+        j.command,
+        j.arguments,
+        j.working_directory,
+        j.exit_code,
+        j.exit_signal,
+        j.output,
+        j.stderr,
+        j.stdin,
+        j.stdout,
+        j.last_in_sequence,
+        j.number_in_sequence,
+        j.no_job_sequence_update
+    FROM
+        jobs AS j
+        LEFT JOIN pl_courses AS c ON (c.id = j.course_id)
+        LEFT JOIN users AS u ON (u.user_id = j.user_id)
+        LEFT JOIN users AS authn_u ON (authn_u.user_id = j.authn_user_id)
+    WHERE
+        j.job_sequence_id = $job_sequence_id
+        AND j.course_id IS NOT DISTINCT FROM $course_id
+    ORDER BY
+        j.number_in_sequence, j.id
+),
+aggregated_member_jobs AS (
+    SELECT
+        count(*) AS job_count,
+        coalesce(array_agg(to_jsonb(j.*)), ARRAY[]::JSONB[]) AS jobs
+    FROM
+        member_jobs AS j
+), object_data AS (
+    SELECT
+        js.id,
+        js.description,
+        js.type,
+        js.status,
+        format_date_iso8601(js.start_date, c.display_timezone) AS start_date,
+        format_date_iso8601(js.finish_date, c.display_timezone) AS finish_date,
+        js.course_id,
+        js.course_instance_id,
+        js.course_request_id,
+        js.assessment_id,
+        js.user_id,
+        u.uid AS user_uid,
+        js.authn_user_id,
+        authn_u.uid AS authn_user_uid,
+        js.number,
+        aggregated_member_jobs.*
+    FROM
+        job_sequences AS js
+        LEFT JOIN pl_courses AS c ON (c.id = js.course_id)
+        LEFT JOIN users AS u ON (u.user_id = js.user_id)
+        LEFT JOIN users AS authn_u ON (authn_u.user_id = js.authn_user_id),
+        aggregated_member_jobs
+    WHERE
+        js.id = $job_sequence_id
+        AND js.course_id IS NOT DISTINCT FROM $course_id
+)
+SELECT
+    coalesce(jsonb_agg(to_jsonb(object_data)), '[]'::jsonb) AS item
+FROM
+    object_data;
+
+-- BLOCK select_job_sequences
+WITH object_data AS (
+    SELECT
+        js.id,
+        js.description,
+        js.type,
+        js.status,
+        format_date_iso8601(js.start_date, c.display_timezone) AS start_date,
+        format_date_iso8601(js.finish_date, c.display_timezone) AS finish_date,
+        js.course_id,
+        js.course_instance_id,
+        js.course_request_id,
+        js.assessment_id,
+        js.user_id,
+        u.uid AS user_uid,
+        js.authn_user_id,
+        authn_u.uid AS authn_user_uid,
+        js.number
+    FROM
+        job_sequences AS js
+        LEFT JOIN pl_courses AS c ON (c.id = js.course_id)
+        LEFT JOIN users AS u ON (u.user_id = js.user_id)
+        LEFT JOIN users AS authn_u ON (authn_u.user_id = js.authn_user_id)
+    WHERE
+        js.course_id IS NOT DISTINCT FROM $course_id
+)
+SELECT
+    coalesce(jsonb_agg(
+        to_jsonb(object_data)
+        ORDER BY number
+    ), '[]'::jsonb) AS item
+FROM
+    object_data;
